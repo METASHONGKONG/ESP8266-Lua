@@ -257,14 +257,14 @@ end
 function table_to_json(json_table)
 
 local json = ""
-json = json .. "{"
+--json = json .. "{"
 
 for key,value in pairs(json_table) do
-  json = json .. "\"" .. key .. "\": \"" .. value .. "\", "
+  json = json .. value  --json = json .. "\"" .. key .. "\": \"" .. value .. "\", "
 end
 
-json = string.sub(json, 0, -3)
-json = json .. "}"
+--json = string.sub(json, 0, -3)
+--json = json .. "}"
 
 return json
 

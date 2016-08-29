@@ -22,6 +22,8 @@ function aREST.handle(conn, request)
         path[#path + 1] = i;
     end
     
+    print('httprequest: ', httprequest)
+    
     mode=path[1];
     pin=path[2];
     command=path[3];
@@ -39,8 +41,8 @@ function aREST.handle(conn, request)
         pwm.stop(2);
 		pwm.stop(4);
         pwm.stop(8);
-        gpio.mode(0,gpio.INPUT);
-        gpio.mode(4,gpio.INPUT);
+        gpio.mode(0,gpio.OUTPUT); -- Ken
+        gpio.mode(4,gpio.OUTPUT); -- Ken
         gpio.mode(1,gpio.OUTPUT);
         gpio.write(1,gpio.LOW);
         gpio.mode(2,gpio.OUTPUT);
