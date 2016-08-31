@@ -11,6 +11,7 @@
 				
 				ap = string.format("%-10s",k)
 				ap = trim(ap)
+				ap = string.gsub(ap,"%s","+")
 				list_ap = list_ap.."<option value = "..ap..">"..ap.."</option>"
 			end
 		
@@ -37,21 +38,18 @@
                 _, _, method, path = string.find(request, "([A-Z]+) (.+) HTTP");  
             end  
 			local _GET={}
-			local s_num = 0
-			local e_num = 0
-			local l_num = 0
-			if (vars ~= nil)then  
-				s_num = string.find(vars,"=")
-				e_num = string.find(vars,"&")
-				l_num = string.len(vars)
-				_GET.sta = string.sub(vars,s_num+1,e_num-1)
+			if (vars ~= nil)then
+				for k, v in string.gmatch(vars, "(%w+)=([^%&]+)&*") do
+					_GET[k] = v
+				end
 				_GET.sta = string.gsub(_GET.sta, "%%(%x%x)", function (h)
 					return string.char(tonumber(h, 16))
 				end)
-				_GET.psd = string.sub(vars,e_num+5,l_num)
-            end  
-			if _GET.sta~=nil and  string.len(_GET.psd)>=8  then
+				_GET.sta = string.gsub(_GET.sta,"+"," ")
+			end
 				
+			if _GET.sta~=nil and  string.len(_GET.psd)>=8  then
+				--print(_GET.sta)
 				file.open("config_wifi.lua","w+")
 				file.writeline('ssid="'.._GET.sta..'"')
 				file.writeline('pwd="'.._GET.psd..'"')
@@ -60,6 +58,8 @@
 			end
             buf = buf.."<!DOCTYPE html><html><head><meta http-equiv=Content-Type content=\"text/html;charset=utf-8\"></head>"
 			buf = buf.."<body><h1> ESP8266 Web Server</h1>" 
+			buf = buf.."2.請選擇需要連接的WIFI，然後輸入對應的密碼，點擊保存，成功連接後顯示屏會顯示對應的信息。</br>"
+            buf = buf.."(備註：當wifi ssid出現空格符的時候會自動轉換為\"+\"號，例如，Hong Kong會轉為Hong+Kong)</br></br>"
 			buf = buf.."<form method = 'get' action='http://"..wifi.ap.getip().."'>"
 			buf = buf.."ssid:<select name = 'sta'>"
 			buf = buf..list_ap.."</select></br>"
