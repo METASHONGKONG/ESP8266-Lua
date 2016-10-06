@@ -21,20 +21,16 @@ srv:listen(80,function(conn)
             end
         end
 		if _GET.num ~= nil then
-			file.open("config.lua","w+")
-			file.writeline('value="'.._GET.num..'"')
+			file.open("thinkspeak_config.lua","w+")
+			file.writeline('thinkspeak_key="'.._GET.thinkspeak_key..'"')
 			file.close()
 			node.restart()
 		end
 		buf = buf.."<!DOCTYPE html><html><head><meta http-equiv=Content-Type content=\"text/html;charset=utf-8\"></head>"
-		buf = buf.."<body><h1>Metas choose project</h1>"
-		buf = buf.."1.請選擇項目,點擊保存,等待重啟完成,重啟後請再次連接192.168.4.1進行下壹步操作。</br></br>"
+		buf = buf.."<body><h1>Thinkspeak API Key</h1>"
+		buf = buf.."1.請輸入API Key,點擊保存,等待重啟完成,會自動重啟。</br></br>"
 		buf = buf.."<form method = 'get' action='http://"..wifi.ap.getip().."'>"
-		buf = buf.."Project:<select name = 'num'>"
-		buf = buf.."<option value = snap>snap</option>"
-		buf = buf.."<option value = scratch>scratch</option>"
-		buf = buf.."<option value = car>car</option>"
-		buf = buf.."<option value = thinkspeak>thinkspeak</option></select></br>"
+		buf = buf.."API Key:<input name='thinkspeak_key'></input></br>"
 		buf = buf.."<button type='submit'>save</button></form></body><html>"
 		client:send(buf)
 		client:close()
