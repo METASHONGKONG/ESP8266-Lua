@@ -11,11 +11,13 @@ analog_value = adc.read(0)
 if analog_value >= 800 then
 	file.remove("config.lua")
 	file.remove("config_wifi.lua")
+    file.remove("config_thinkspeak.lua")
 end
 print(analog_value)
 if pcall(function ()require "config" end) then
 	
-	if value ~= "test" then
+	if value ~= "thinkspeak" or pcall(function ()require "config_thingspeak" end) then
+    
         if pcall(function ()require "config_wifi" end) then
             
             --file.remove("config.lua")
@@ -43,7 +45,10 @@ if pcall(function ()require "config" end) then
                         cfg.pwd = "12345678"
                         wifi.ap.config(cfg)  
                         ip = wifi.ap.getip()
-                        init_display(cfg.ssid,cfg.pwd,ip)
+                        
+                        display_word("Time Out > DC")                                              
+                        tmr.alarm(0,5000,0,function() init_display(cfg.ssid,cfg.pwd,ip)end)                        
+                        
                     else	
                         display_runconfig(ssid,pwd)
                         ip = wifi.sta.getip()
@@ -51,42 +56,40 @@ if pcall(function ()require "config" end) then
                     end
                 else
                     tmr.stop(0)
-                    
+                    print("123")
                     if value == "thinkspeak" then
                     
-                        if pcall(function ()require "config_thinkspeak" end) then
+                        if pcall(function ()require "config_thingspeak" end) then
                             print("Start thinkspeak function")
                             work_display(value)
                             require "arest_thinkspeak"
                         else
-                            print("Input thinkspeak key")
-                            work_display(value)
+                            print("Input thinkspeak key")                            
+                            display_word("Input Key")
+                            tmr.alarm(0,5000,0,function()
+                                init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
+                            end)                            
                             require "thinkspeak_config"
                         end
                         
                         
                     else
                         if value == "scratch" then
-                            math.randomseed(tmr.now());
-                            connectionpw = math.random(0,255);
-                            local deviceid = "";
-                            for i in string.gmatch(ip..".", "([^\.]*)\.") do
-                            deviceid = deviceid..string.format("%02X", tonumber(bit.bxor(i, connectionpw)));
-                            end
-                            deviceid = deviceid..string.format("%02X", connectionpw);
-                            deviceid = string.sub(deviceid, 5);
-                            deviceid = string.sub(deviceid, 1, 3).." "..string.sub(deviceid, 4);
-                            if timeout>=40 then
-                                display_deviceid(cfg.ssid,cfg.pwd,deviceid)
-                            else
-                            
-                                --display_deviceid(ssid,pwd,deviceid)
                         
-                                ip_len = string.len(ip)
-                                display_deviceid(string.sub(ip,1,11),string.sub(ip,12,ip_len),deviceid)
-                            end
                             require "wire"
+                            print("scratch working")
+                            work_display(value)	
                             rest = require "arest_scratch"
+                              
+                                                                                                  
+                            if timeout>=40 then
+                                display_word("Time Out > DC")                                              
+                                tmr.alarm(0,5000,0,function() init_display(cfg.ssid,cfg.pwd,ip)end)     
+                            else                                                                                            
+                                ip_len = string.len(ip)
+                                display_deviceid(ssid,ip)
+                            end                                                       
+                            
                         else
                             if value == "snap" then
                                 print("snap working")
@@ -101,7 +104,7 @@ if pcall(function ()require "config" end) then
                                 display_deviceid(cfg.ssid,cfg.pwd,ip)
                             else
                                 len_num = string.len(ip)
-                                display_deviceid(ssid,string.sub(ip,1,7),string.sub(ip,8,len_num))
+                                display_deviceid(ssid,ip)
                             end
                         end
                         
@@ -126,20 +129,29 @@ if pcall(function ()require "config" end) then
         else
             print("run_config")
             require "run_config"
-            init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
+            display_word("Choose Wifi")
+            tmr.alarm(0,5000,0,function()
+                init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
+            end)            
 
         end
 				
 	else
-		print("test working")
-		work_display(value)
-		require "test"
-		file.remove("config.lua")
+        print("Input thinkspeak key")                            
+        display_word("Input Key")
+        tmr.alarm(0,5000,0,function()
+            init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
+        end)                            
+        require "thinkspeak_config"                            
 	end
 	
 	
 else
 	print("choose project")
 	require "list_config"
-	init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
+    display_word("Choose project")
+    tmr.alarm(0,5000,0,function()
+        init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
+    end)
+	
 end

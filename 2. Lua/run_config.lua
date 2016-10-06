@@ -1,23 +1,8 @@
 	function trim(s)
 		return (s:gsub("^%s*(.-)%s*$", "%1"))
 	end
-	wifi.setmode(wifi.STATIONAP)
-	list_ap = ""
-	--local for_mat={}
-	wifi.sta.getap(function (t)
-		if t then 
-			
-			for k,v in pairs(t) do
-				
-				ap = string.format("%-10s",k)
-				ap = trim(ap)
-				ap = string.gsub(ap,"%s","+")
-				list_ap = list_ap.."<option value = "..ap..">"..ap.."</option>"
-			end
-		
-		end
-	
-	end)
+	wifi.setmode(wifi.SOFTAP)
+
 
 	cfg = {}
 	cfg.ssid = "Metas"..node.chipid()
@@ -61,9 +46,8 @@
 			buf = buf.."2.請選擇需要連接的WIFI，然後輸入對應的密碼，點擊保存，成功連接後顯示屏會顯示對應的信息。</br>"
             buf = buf.."(備註：當wifi ssid出現空格符的時候會自動轉換為\"+\"號，例如，Hong Kong會轉為Hong+Kong)</br></br>"
 			buf = buf.."<form method = 'get' action='http://"..wifi.ap.getip().."'>"
-			buf = buf.."ssid:<select name = 'sta'>"
-			buf = buf..list_ap.."</select></br>"
-			buf = buf.."pwd:<input type='password' name='psd'></input><br>"
+			buf = buf.."Wifi ID:<input name='sta'></input></br>"
+			buf = buf.."Wifi Password:<input type='password' name='psd'></input><br>"
 			buf = buf.."<button type='submit'>save</button></form></body><html>"
             client:send(buf); 
 			tmr.delay(50000)			

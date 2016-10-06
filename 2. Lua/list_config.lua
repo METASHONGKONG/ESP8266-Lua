@@ -32,8 +32,7 @@ srv:listen(80,function(conn)
 		buf = buf.."<form method = 'get' action='http://"..wifi.ap.getip().."'>"
 		buf = buf.."Project:<select name = 'num'>"
 		buf = buf.."<option value = snap>snap</option>"
-		buf = buf.."<option value = scratch>scratch</option>"
-		buf = buf.."<option value = car>car</option>"
+		buf = buf.."<option value = scratch>scratch</option>"		
 		buf = buf.."<option value = thinkspeak>thinkspeak</option></select></br>"
 		buf = buf.."<button type='submit'>save</button></form></body><html>"
 		client:send(buf)
