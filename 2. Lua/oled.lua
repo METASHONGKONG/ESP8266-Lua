@@ -47,7 +47,7 @@ function display_deviceid(ssid,ip)
     repeat
       
         disp:drawStr(0,0, "Wifi:"..ssid);
-		disp:drawStr(0,12, "IP:"..ip);
+		disp:drawStr(0,12, ip);
 		disp:drawStr(12,24, "Connected");
     until disp:nextPage() == false
 end

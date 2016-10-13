@@ -1,8 +1,4 @@
-	function trim(s)
-		return (s:gsub("^%s*(.-)%s*$", "%1"))
-	end
 	wifi.setmode(wifi.SOFTAP)
-
 
 	cfg = {}
 	cfg.ssid = "Metas"..node.chipid()

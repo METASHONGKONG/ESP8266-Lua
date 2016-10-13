@@ -1,2 +1,1 @@
-value="thinkspeak"
---choose project
+value="snap"
