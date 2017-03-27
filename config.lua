@@ -1,2 +1,0 @@
-value="snap"
---choose project
