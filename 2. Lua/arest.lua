@@ -188,32 +188,32 @@ function aREST.handle(conn, request)
     end
     
   if mode == "forward" then 
-		gpio.write(R_D5,gpio.HIGH)
-		gpio.write(L_D3,gpio.HIGH)
+		pwm.setduty(R_D5,1023)
+		pwm.setduty(L_D3,1023)
 		gpio.write(R_D0,gpio.HIGH)
 		gpio.write(L_D4,gpio.LOW) 
         answer['message'] = "car forward now... "   
       elseif mode == "backward" then
-		gpio.write(R_D5,gpio.HIGH)
-		gpio.write(L_D3,gpio.HIGH)
+		pwm.setduty(R_D5,1023)
+		pwm.setduty(L_D3,1023)
 		gpio.write(R_D0,gpio.LOW)
 		gpio.write(L_D4,gpio.HIGH) 
         answer['message'] = "car backward now... " 
       elseif  mode == "left" then
-		gpio.write(R_D5,gpio.HIGH)
-		gpio.write(L_D3,gpio.HIGH)
+		pwm.setduty(R_D5,1023)
+		pwm.setduty(L_D3,1023)
 		gpio.write(L_D4,gpio.HIGH)
 		gpio.write(R_D0,gpio.HIGH)
         answer['message'] = "car left now... " 
       elseif mode == "right" then
-		gpio.write(R_D5,gpio.HIGH)
-		gpio.write(L_D3,gpio.HIGH)
+		pwm.setduty(R_D5,1023)
+		pwm.setduty(L_D3,1023)
 		gpio.write(R_D0,gpio.LOW)
 		gpio.write(L_D4,gpio.LOW) 
         answer['message'] = "car right now... " 
       elseif mode == "stop" then
-		gpio.write(R_D5,gpio.LOW)
-		gpio.write(L_D3,gpio.LOW)
+		pwm.setduty(R_D5,0)
+		pwm.setduty(L_D3,0)
         answer['message'] = "car stop now... " 
     end	
 

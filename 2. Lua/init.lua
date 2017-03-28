@@ -1,26 +1,34 @@
 require "oled"
 init_set()
 
---Initialize all pins--
+-----------------Initialize all pins-----------------
 
+--Output: Reset
 gpio.mode(1,gpio.OUTPUT);
 gpio.write(1,gpio.LOW);
 gpio.mode(2,gpio.OUTPUT);
 gpio.write(2,gpio.LOW);
+
+--Input: Read A0 first
 gpio.mode(8,gpio.OUTPUT)
 gpio.write(8,gpio.HIGH)
 
---usb下载口朝向车头--
+--Motor: initialize and reset
 local R_D0 = 0 --右脚正反转
 local R_D5 = 5 --右脚马达
 local L_D4 = 4 --左脚正反转
 local L_D3 = 3 --左脚马达
 
+gpio.mode(R_D0,gpio.OUTPUT)
+gpio.mode(L_D4,gpio.OUTPUT)
+
 pwm.setup(R_D5,50,0)
 pwm.setup(L_D3,50,0)
 pwm.start(R_D5)
 pwm.start(L_D3)
-    
+
+-----------------Initialize all pins-----------------
+
 --Reset network wifi--
 
 analog_value = adc.read(0) 
