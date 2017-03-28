@@ -5,25 +5,21 @@ init_set()
 
 gpio.mode(1,gpio.OUTPUT);
 gpio.write(1,gpio.LOW);
-gpio.mode(8,gpio.OUTPUT);
-gpio.write(8,gpio.LOW);
-gpio.mode(0,gpio.OUTPUT)
-gpio.write(0,gpio.HIGH)
+gpio.mode(2,gpio.OUTPUT);
+gpio.write(2,gpio.LOW);
+gpio.mode(8,gpio.OUTPUT)
+gpio.write(8,gpio.HIGH)
 
-local M2_CW = 5 --右脚正转
-local M2_ACW = 4 --右脚反转
-local M1_CW = 2 --左脚正转
-local M1_ACW = 3 --左脚反转
+--usb下载口朝向车头--
+local R_D0 = 0 --右脚正反转
+local R_D5 = 5 --右脚马达
+local L_D4 = 4 --左脚正反转
+local L_D3 = 3 --左脚马达
 
-pwm.setup(M2_CW,50,70)
-pwm.setup(M2_ACW,50,70)
-pwm.setup(M1_CW,50,70) 
-pwm.setup(M1_ACW,50,70) 
-
-pwm.start(M2_CW)
-pwm.start(M2_ACW)
-pwm.start(M1_CW)
-pwm.start(M1_ACW)
+pwm.setup(R_D5,50,0)
+pwm.setup(L_D3,50,0)
+pwm.start(R_D5)
+pwm.start(L_D3)
     
 --Reset network wifi--
 
