@@ -5,7 +5,6 @@
 	l = string.len(cfg.ssid)
 	cfg.ssid = string.sub(cfg.ssid,1,l-1)
 	cfg.pwd = "12345678"
-	--wifi.setmode(wifi.SOFTAP)  
     wifi.ap.config(cfg)  
 	srv = nil
     srv=net.createServer(net.TCP)  
@@ -48,8 +47,9 @@
 			buf = buf.."<button type='submit'>save</button></form></body><html>"
             client:send(buf); 
 			tmr.delay(50000)			
-            client:close();  
+            --client:close();  
             collectgarbage();  
-        end)  
+        end)
+			conn:on("sent",function(conn) conn:close() end)
     end)  
 
