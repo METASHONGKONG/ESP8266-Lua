@@ -197,14 +197,14 @@ function aREST.handle(conn, request)
 	if mode == "forward" then 
 		pwm.setduty(R_D5,1023)
 		pwm.setduty(L_D3,1023)
-		gpio.write(R_D0,gpio.HIGH)
-		gpio.write(L_D4,gpio.LOW) 
+		gpio.write(R_D0,gpio.LOW)
+		gpio.write(L_D4,gpio.HIGH) 
         answer['message'] = "car forward now... "   
 	elseif mode == "backward" then
 		pwm.setduty(R_D5,1023)
 		pwm.setduty(L_D3,1023)
-		gpio.write(R_D0,gpio.LOW)
-		gpio.write(L_D4,gpio.HIGH) 
+		gpio.write(R_D0,gpio.HIGH)
+		gpio.write(L_D4,gpio.LOW) 
         answer['message'] = "car backward now... " 
 	elseif  mode == "left" then
 		pwm.setduty(R_D5,1023)
