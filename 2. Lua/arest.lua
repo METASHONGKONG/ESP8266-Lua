@@ -110,6 +110,7 @@ function aREST.handle(conn, request)
     end
 
     if mode == "digital" then
+		pwm.stop(pin)
         if command == "0" then 
             gpio.mode(pin, gpio.OUTPUT)
             gpio.write(pin, gpio.LOW)
@@ -187,31 +188,37 @@ function aREST.handle(conn, request)
         end
     end
     
-  if mode == "forward" then 
+	
+	--Reset common port for D4
+	pwm.stop(L_D4)
+	gpio.mode(R_D0,gpio.OUTPUT)
+	gpio.mode(L_D4,gpio.OUTPUT)
+	
+	if mode == "forward" then 
 		pwm.setduty(R_D5,1023)
 		pwm.setduty(L_D3,1023)
 		gpio.write(R_D0,gpio.HIGH)
 		gpio.write(L_D4,gpio.LOW) 
         answer['message'] = "car forward now... "   
-      elseif mode == "backward" then
+	elseif mode == "backward" then
 		pwm.setduty(R_D5,1023)
 		pwm.setduty(L_D3,1023)
 		gpio.write(R_D0,gpio.LOW)
 		gpio.write(L_D4,gpio.HIGH) 
         answer['message'] = "car backward now... " 
-      elseif  mode == "left" then
+	elseif  mode == "left" then
 		pwm.setduty(R_D5,1023)
 		pwm.setduty(L_D3,1023)
 		gpio.write(L_D4,gpio.HIGH)
 		gpio.write(R_D0,gpio.HIGH)
         answer['message'] = "car left now... " 
-      elseif mode == "right" then
+	elseif mode == "right" then
 		pwm.setduty(R_D5,1023)
 		pwm.setduty(L_D3,1023)
 		gpio.write(R_D0,gpio.LOW)
 		gpio.write(L_D4,gpio.LOW) 
         answer['message'] = "car right now... " 
-      elseif mode == "stop" then
+	elseif mode == "stop" then
 		pwm.setduty(R_D5,0)
 		pwm.setduty(L_D3,0)
         answer['message'] = "car stop now... " 
