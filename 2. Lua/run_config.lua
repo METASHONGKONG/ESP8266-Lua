@@ -1,30 +1,10 @@
-	function trim(s)
-		return (s:gsub("^%s*(.-)%s*$", "%1"))
-	end
-	wifi.setmode(wifi.STATIONAP)
-	list_ap = ""
-	--local for_mat={}
-	wifi.sta.getap(function (t)
-		if t then 
-			
-			for k,v in pairs(t) do
-				
-				ap = string.format("%-10s",k)
-				ap = trim(ap)
-				ap = string.gsub(ap,"%s","+")
-				list_ap = list_ap.."<option value = "..ap..">"..ap.."</option>"
-			end
-		
-		end
-	
-	end)
+	wifi.setmode(wifi.SOFTAP)
 
 	cfg = {}
 	cfg.ssid = "Metas"..node.chipid()
 	l = string.len(cfg.ssid)
-	cfg.ssid = string.sub(cfg.ssid,1,l-2)
+	cfg.ssid = string.sub(cfg.ssid,1,l-1)
 	cfg.pwd = "12345678"
-	--wifi.setmode(wifi.SOFTAP)  
     wifi.ap.config(cfg)  
 	srv = nil
     srv=net.createServer(net.TCP)  
@@ -56,19 +36,20 @@
 				file.close()
 				node.restart()
 			end
-            buf = buf.."<!DOCTYPE html><html><head><meta http-equiv=Content-Type content=\"text/html;charset=utf-8\"></head>"
-			buf = buf.."<body><h1> ESP8266 Web Server</h1>" 
-			buf = buf.."2.請選擇需要連接的WIFI，然後輸入對應的密碼，點擊保存，成功連接後顯示屏會顯示對應的信息。</br>"
-            buf = buf.."(備註：當wifi ssid出現空格符的時候會自動轉換為\"+\"號，例如，Hong Kong會轉為Hong+Kong)</br></br>"
+            buf = buf.."HTTP/1.1 200 OK\r\nContent-type: text/html\r\nAccess-Control-Allow-Origin:* \r\n\r\n <!DOCTYPE html><html><head><meta http-equiv=Content-Type content=\"text/html;charset=utf-8\"></head>"
+			buf = buf.."<body><h1>Wifi Configuration</h1>" 
+			buf = buf.."Please input the required WIFI and password，then click 'save' button.</br></br>"
+            buf = buf.."(Note 1： The wifi information will be memorized in NodeOne after this configuration.)</br>"
+            buf = buf.."(Note 2： If you want to reset it, place the pressed button in A0, then re-open NodeOne again. Afterwards, remove button in 5 seconds.)</br></br>"
 			buf = buf.."<form method = 'get' action='http://"..wifi.ap.getip().."'>"
-			buf = buf.."ssid:<select name = 'sta'>"
-			buf = buf..list_ap.."</select></br>"
-			buf = buf.."pwd:<input type='password' name='psd'></input><br>"
+			buf = buf.."Wifi ID:<input name='sta'></input></br>"
+			buf = buf.."Wifi Password:<input type='password' name='psd'></input><br><br>"
 			buf = buf.."<button type='submit'>save</button></form></body><html>"
             client:send(buf); 
 			tmr.delay(50000)			
-            client:close();  
+            --client:close();  
             collectgarbage();  
-        end)  
+        end)
+			conn:on("sent",function(conn) conn:close() end)
     end)  
 
