@@ -1,125 +1,141 @@
 require "oled"
-
 init_set()
-gpio.mode(3,gpio.OUTPUT)
-gpio.write(3,gpio.LOW)
-gpio.mode(5,gpio.OUTPUT)
-gpio.write(5,gpio.LOW) 
+
+-----------------Initialize all pins-----------------
+
+--Output: Reset
+gpio.mode(1,gpio.OUTPUT);
+gpio.write(1,gpio.LOW);
+gpio.mode(2,gpio.OUTPUT);
+gpio.write(2,gpio.LOW);
+
+--Input: Read A0 first
 gpio.mode(8,gpio.OUTPUT)
 gpio.write(8,gpio.HIGH)
-analog_value = adc.read(0)
+
+--Motor: initialize and reset
+local R_D0 = 0 --右脚正反转
+local R_D5 = 5 --右脚马达
+local L_D4 = 4 --左脚正反转
+local L_D3 = 3 --左脚马达
+
+gpio.mode(R_D0,gpio.OUTPUT)
+gpio.mode(L_D4,gpio.OUTPUT)
+
+pwm.setup(R_D5,50,0)
+pwm.setup(L_D3,50,0)
+pwm.start(R_D5)
+pwm.start(L_D3)
+
+-----------------Initialize all pins-----------------
+
+--Reset network wifi--
+
+analog_value = adc.read(0) 
 if analog_value >= 800 then
-	file.remove("config.lua")
-	file.remove("config_wifi.lua")
+    local timeout = 0    
+    print("Reset mode")
+    tmr.alarm(1,500,1,function()                 
+        timeout = timeout+0.5
+        analog_value = adc.read(0)
+        print("Checking..  "..analog_value)
+        
+        if timeout == 5 then
+            tmr.stop(1)
+        else
+            if analog_value < 100 then
+                tmr.stop(0)
+                tmr.stop(4)
+                tmr.stop(5)
+                timeout = 4.5
+                file.remove("config_wifi.lua")
+                display_word(" Reset OK")
+                print("Reset OK")                
+                tmr.alarm(2,4000,0,function() display_word("Restart...")	end)
+                tmr.alarm(3,5000,0,function() node.restart()	end)                
+            end
+        end
+    end)  
 end
 print(analog_value)
-if pcall(function ()require "config" end) then
-	
-	if value ~= "test" then
-				if pcall(function ()require "config_wifi" end) then
-					
-					--file.remove("config.lua")
-					srv = nil
-					wifi.setmode(wifi.STATIONAP)
-					wifi.sta.config(ssid,pwd)
-					wifi.sta.connect()
-					local timeout = 0
-					local ip = wifi.sta.getip()
-					tmr.alarm(0,1000,1,function ()
-					timeout = timeout+1
-				if ip == nil then
-				
-					 print("please wait")
-					
-					if timeout >= 40 then
-						--file.remove("config_wifi.lua")
-						cfg = {}
-						cfg.ssid = "Metas"..node.chipid()
-						l = string.len(cfg.ssid)
-						cfg.ssid = string.sub(cfg.ssid,1,l-2)
-						cfg.pwd = "12345678"
-						wifi.ap.config(cfg)  
-						ip = wifi.ap.getip()
-						init_display(cfg.ssid,cfg.pwd,ip)
-					else	
-						display_runconfig(ssid,pwd)
-						ip = wifi.sta.getip()
-						
-					end
-				else
-					tmr.stop(0)
-					if value == "scratch" then
-						math.randomseed(tmr.now());
-					    connectionpw = math.random(0,255);
-						local deviceid = "";
-						for i in string.gmatch(ip..".", "([^\.]*)\.") do
-						deviceid = deviceid..string.format("%02X", tonumber(bit.bxor(i, connectionpw)));
-						end
-						deviceid = deviceid..string.format("%02X", connectionpw);
-						deviceid = string.sub(deviceid, 5);
-						deviceid = string.sub(deviceid, 1, 3).." "..string.sub(deviceid, 4);
-						if timeout>=40 then
-							display_deviceid(cfg.ssid,cfg.pwd,deviceid)
-						else
-						
-							--display_deviceid(ssid,pwd,deviceid)
-					
-							ip_len = string.len(ip)
-							display_deviceid(string.sub(ip,1,11),string.sub(ip,12,ip_len),deviceid)
-						end
-						require "wire"
-						rest = require "arest_scratch"
-					else
-						if value == "snap" then
-							print("snap working")
-							work_display(value)	
-							rest = require "arest_snap"		
-						elseif value == "car" then
-							print("car working")
-							work_display(value)
-							rest = require "arest_car"
-						end
-						if timeout>=40 then
-							display_deviceid(cfg.ssid,cfg.pwd,ip)
-						else
-							len_num = string.len(ip)
-							display_deviceid(ssid,string.sub(ip,1,7),string.sub(ip,8,len_num))
-					end
-				end
-					ip = nil
-					cfg = nil
-					ssid = nil 
-					pwd = nil
-					l = nil
-					len_num  = nil
-					deviceid = nil
-				
-					srv=net.createServer(net.TCP) 
-					srv:listen(80,function(conn)
-					conn:on("receive",function(conn,request)
-						rest.handle(conn, request)
-					  end)
-					  conn:on("sent",function(conn) conn:close() end)
-					end)
-				end
-																						end)
-				else
-					print("run_config")
-					require "run_config"
-					init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
 
-				end
-				
-	else
-		print("test working")
-		work_display(value)
-		require "test"
-		file.remove("config.lua")
-	end
-	
-	
-else
-	print("choose project")
-	require "list_config"
-	init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
-end
+--Welcome page with OS version--
+display_word("  Welcome")
+
+
+--Input wifi/connect wifi--
+tmr.alarm(4,5000,0,function()
+    if pcall(function ()require "config_wifi" end) then
+            
+        srv = nil
+        wifi.setmode(wifi.STATION)
+        wifi.sta.config(ssid,pwd)
+        wifi.sta.connect()
+        local timeout = 0
+        local ip = wifi.sta.getip()
+        
+        tmr.alarm(0,1000,1,function ()
+            timeout = timeout+1
+            
+            if ip == nil then
+
+                print("please wait")
+                
+                if timeout >= 25 then
+                    --file.remove("config_wifi.lua")
+                    cfg = {}
+                    cfg.ssid = "Metas"..node.chipid()
+                    l = string.len(cfg.ssid)
+                    cfg.ssid = string.sub(cfg.ssid,1,l-1)
+                    cfg.pwd = "12345678"
+                    wifi.ap.config(cfg)  
+                    wifi.setmode(wifi.SOFTAP)
+                    ip = wifi.ap.getip()                        
+                    display_word(" Time Out")                                              
+                    
+                else	               
+                    ip = wifi.sta.getip()
+                    if timeout < 4 then                   
+                        display_wifi(ssid,pwd)
+                    else
+                        display_word("Connecting..") 
+                    end
+                end
+            else
+                tmr.stop(0)
+                            
+                print('IP: ', ip)        
+                rest = require "arest"
+                    
+                if timeout>=25 then
+                    display_word("Direct Mode") 
+                    tmr.alarm(0,5000,0,function() init_display(cfg.ssid,cfg.pwd,ip)	end) 
+                else
+                    len_num = string.len(ip)
+                    display_word("  Ready")
+                    tmr.alarm(0,5000,0,function() display_ip(ssid,string.sub(ip,1,10),string.sub(ip,11,len_num))	end)  
+                                
+                end
+
+                srv=net.createServer(net.TCP) 
+                srv:listen(80,function(conn)
+                conn:on("receive",function(conn,request)
+                    rest.handle(conn, request)
+                  end)
+                  conn:on("sent",function(conn) conn:close() end)
+                end)
+            
+            end
+        end)
+        
+    else
+        print("run_config: input wifi")
+        require "run_config"
+        display_two_row("NodeOne"," OS Ver1.3")
+        tmr.alarm(5,5000,0,function()  display_word("Input Wifi") end)
+        tmr.alarm(0,10000,0,function()
+            init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
+        end)  
+
+    end
+end)  
