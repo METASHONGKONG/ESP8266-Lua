@@ -82,14 +82,18 @@ tmr.alarm(4,5000,0,function()
                 
                 if timeout >= 25 then
                     wifi.sta.disconnect()
-					wifi.setmode(wifi.SOFTAP)
+					
+					-- AP SSID/PW config               
+					apcfg = {}
+					apcfg.ssid = "Metas"..node.chipid()                    
+					apcfg.ssid = string.sub(apcfg.ssid,1,string.len(apcfg.ssid)-1)
+					apcfg.pwd = "12345678"
 
-					cfg = {}
-					cfg.ssid = "Metas"..node.chipid()
-					l = string.len(cfg.ssid)
-					cfg.ssid = string.sub(cfg.ssid,1,l-1)
-					cfg.pwd = "12345678"
-					wifi.ap.config(cfg)
+					-- Wifi AP mode
+					wifi.setmode(wifi.SOFTAP)
+					wifi.ap.config(apcfg)  
+					print("AP mode started: "..apcfg.ssid.." "..apcfg.pwd)
+
                     ip = wifi.ap.getip()                        
                     display_word(" Time Out")                                              
                     
@@ -109,7 +113,7 @@ tmr.alarm(4,5000,0,function()
                     
                 if timeout>=25 then
                     display_word("Direct Mode") 
-                    tmr.alarm(0,5000,0,function() init_display(cfg.ssid,cfg.pwd,ip)	end) 
+                    tmr.alarm(0,5000,0,function() init_display(apcfg.ssid,apcfg.pwd,ip)	end) 
                 else
                     len_num = string.len(ip)
                     display_word("  Ready")
@@ -135,7 +139,7 @@ tmr.alarm(4,5000,0,function()
         display_two_row("NodeOne"," OS Ver1.3")
         tmr.alarm(5,5000,0,function()  display_word("Input Wifi") end)
         tmr.alarm(0,10000,0,function()
-            init_display(cfg.ssid,cfg.pwd,wifi.ap.getip())
+            init_display(apcfg.ssid,apcfg.pwd,wifi.ap.getip())
         end)  
 
     end
