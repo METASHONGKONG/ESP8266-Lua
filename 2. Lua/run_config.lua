@@ -7,7 +7,7 @@ apcfg.pwd = "12345678"
 -- Wifi AP mode
 wifi.setmode(wifi.SOFTAP)
 wifi.ap.config(apcfg)  
-print("AP mode started: "..apcfg.ssid.." "..apcfg.pwd)
+print("AP mode started: "..apcfg.ssid.." "..apcfg.pwd.." "..wifi.ap.getip())
 
 function receiver(conn,request)
 	
@@ -40,12 +40,12 @@ function receiver(conn,request)
 	buf = buf.."Please input the required WIFI and password，then click 'save' button.</br></br>"
 	buf = buf.."(Note 1： The wifi information will be memorized in NodeOne after this configuration.)</br>"
 	buf = buf.."(Note 2： If you want to reset it, place the pressed button in A0, then re-open NodeOne again. Afterwards, remove button in 5 seconds.)</br></br>"
-	buf = buf.."<form method = 'get' action='http://"..wifi.ap.getip().."'>"
+	buf = buf.."<form method = 'get' action='http://192.168.4.1'>"
 	buf = buf.."Wifi ID:<input name='sta'></input></br>"
 	buf = buf.."Wifi Password:<input type='password' name='psd'></input><br><br>"
 	buf = buf.."<button type='submit'>save</button></form></body><html>"
-	conn:send(buf); 
-	collectgarbage();  
+	conn:send(buf)
+	collectgarbage()
 end
 
 -- Create TCP server port 80
