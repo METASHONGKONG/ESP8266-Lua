@@ -67,7 +67,6 @@ display_word("  Welcome")
 tmr.alarm(4,5000,0,function()
     if pcall(function ()require "config_wifi" end) then
             
-        srv = nil
         wifi.setmode(wifi.STATION)
         wifi.sta.config(ssid,pwd)
         wifi.sta.connect()
@@ -82,14 +81,15 @@ tmr.alarm(4,5000,0,function()
                 print("please wait")
                 
                 if timeout >= 25 then
-                    --file.remove("config_wifi.lua")
-                    cfg = {}
-                    cfg.ssid = "Metas"..node.chipid()
-                    l = string.len(cfg.ssid)
-                    cfg.ssid = string.sub(cfg.ssid,1,l-1)
-                    cfg.pwd = "12345678"
-                    wifi.ap.config(cfg)  
-                    wifi.setmode(wifi.SOFTAP)
+                    wifi.sta.disconnect()
+					wifi.setmode(wifi.SOFTAP)
+
+					cfg = {}
+					cfg.ssid = "Metas"..node.chipid()
+					l = string.len(cfg.ssid)
+					cfg.ssid = string.sub(cfg.ssid,1,l-1)
+					cfg.pwd = "12345678"
+					wifi.ap.config(cfg)
                     ip = wifi.ap.getip()                        
                     display_word(" Time Out")                                              
                     
@@ -116,13 +116,14 @@ tmr.alarm(4,5000,0,function()
                     tmr.alarm(0,5000,0,function() display_ip(ssid,string.sub(ip,1,10),string.sub(ip,11,len_num))	end)  
                                 
                 end
-
+				
+				srv = nil
                 srv=net.createServer(net.TCP) 
                 srv:listen(80,function(conn)
-                conn:on("receive",function(conn,request)
-                    rest.handle(conn, request)
-                  end)
-                  conn:on("sent",function(conn) conn:close() end)
+					conn:on("receive",function(conn,request)
+						rest.handle(conn, request)
+					end)
+					conn:on("sent",function(conn) conn:close() end)
                 end)
             
             end
