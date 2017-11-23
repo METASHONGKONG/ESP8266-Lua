@@ -1,6 +1,9 @@
-# NodeOne OS Version 1.31
+# NodeOne OS Version 1.4
 
 ## History
+
+Version 1.31 [23/Nov/2017]
+* Syn with NodeOne 1 OS 1.4
 
 Version 1.31 [26/Apr/2017]
 * Code consolidation
