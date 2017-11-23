@@ -9,10 +9,10 @@ local message = "Wrong API."
 
 function aREST.handle(conn, request)
 
-    local M2_CW = 5 
-    local M2_ACW = 4 
-    local M1_CW = 2 
-    local M1_ACW = 3	
+	local R_D0 = 0
+	local R_D5 = 5
+	local L_D4 = 4
+	local L_D3 = 3
 	
     -- New request, Find start/end
     local e = string.find(request, "/")
@@ -114,22 +114,22 @@ function aREST.handle(conn, request)
 		
         if value[2] == 1 then 
             if value[3] == "cw" then 
-                pwm.setduty(M1_CW,value[4]) 
-                pwm.setduty(M1_ACW,0)
+				gpio.write(R_D0,gpio.HIGH)
+                pwm.setduty(R_D5,value[4])
                 message = "Motor " .. value[2] .. " set to " .. value[4] .. " in " .. value[3]   
             elseif value[3] == "acw" then
-                pwm.setduty(M1_CW,0) 
-                pwm.setduty(M1_ACW,value[4])
+				gpio.write(R_D0,gpio.LOW)
+                pwm.setduty(R_D5,value[4])
                 message = "Motor " .. value[2] .. " set to " .. value[4] .. " in " .. value[3]  
             end 
         elseif value[2] == 2 then
             if value[3] == "cw" then 
-                pwm.setduty(M2_ACW,0) 
-                pwm.setduty(M2_CW,value[4])
+				gpio.write(L_D4,gpio.HIGH)
+                pwm.setduty(L_D3,value[4])
                 message = "Motor " .. value[2] .. " set to " .. value[4] .. " in " .. value[3]   
             elseif value[3] == "acw" then
-                pwm.setduty(M2_ACW,value[4]) 
-                pwm.setduty(M2_CW,0)
+				gpio.write(L_D4,gpio.LOW)
+                pwm.setduty(L_D3,value[4])
                 message = "Motor " .. value[2] .. " set to " .. value[4] .. " in " .. value[3]  
             end 
         end
@@ -137,15 +137,15 @@ function aREST.handle(conn, request)
     
 	if(value[2] ~= nil) then value[2] = error_handling(tonumber(value[2]),0,1023) end
 	if mode == "forward" and not check_nil(value, 2) then 
-		message = motor_control(value[2],0,0,value[2],"forward",value[2])
+		message = motor_control(value[2],value[2],0,1,"forward",value[2])
 	elseif mode == "backward" and not check_nil(value, 2) then
-		message = motor_control(0,value[2],value[2],0,"backward",value[2])
+		message = motor_control(value[2],value[2],1,0,"backward",value[2])
 	elseif  mode == "left" and not check_nil(value, 2) then
-		message = motor_control(value[2],0,value[2],0,"left",value[2])
+		message = motor_control(value[2],value[2],1,1,"left",value[2])
 	elseif mode == "right" and not check_nil(value, 2) then
-		message = motor_control(0,value[2],0,value[2],"right",value[2])
+		message = motor_control(value[2],value[2],0,0,"right",value[2])
 	elseif mode == "stop" and not check_nil(value, 1) then
-		message = motor_control(200,200,200,200,"stop","")
+		message = motor_control(0,0,0,0,"stop","")
     end	
                    
     if mode == "temperature" then
@@ -161,12 +161,11 @@ function aREST.handle(conn, request)
     conn:send("HTTP/1.1 200 OK\r\nContent-type: text/html\r\nAccess-Control-Allow-Origin:* \r\n\r\n" .. message .. "\r\n")
 end
 
-function motor_control(M2_CW_speed,M2_ACW_speed,M1_CW_speed,M1_ACW_speed,direction,speed)
-
-	pwm.setduty(5,M2_CW_speed) 
-	pwm.setduty(4,M2_ACW_speed)
-	pwm.setduty(2,M1_CW_speed)
-	pwm.setduty(3,M1_ACW_speed) 
+function motor_control(M2_speed,M1_speed,M2_direction,M1_direction,direction,speed)
+	pwm.setduty(5,M2_speed)
+	pwm.setduty(3,M1_speed) 
+	gpio.write(0,M2_direction)
+	gpio.write(4,M1_direction)
 	return "car "..direction.." "..speed.." now... "
 	
 end
