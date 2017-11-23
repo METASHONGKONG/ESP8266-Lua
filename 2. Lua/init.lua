@@ -3,21 +3,23 @@ init_set()
 
 --Initialize all pins--
 function Initialization()
+	--Output: Reset
 	gpio.mode(1,gpio.OUTPUT);
 	gpio.write(1,gpio.LOW);
-	gpio.mode(8,gpio.OUTPUT);
-	gpio.write(8,gpio.LOW);
-	gpio.mode(0,gpio.OUTPUT);
-	gpio.write(0,gpio.HIGH);
+	gpio.mode(2,gpio.OUTPUT);
+	gpio.write(2,gpio.LOW);
 
-	pwm.setup(5,50,70) --右脚正转
-	pwm.setup(4,50,70) --右脚反转
-	pwm.setup(2,50,70) --左脚正转
-	pwm.setup(3,50,70) --左脚反转
+	--Input: Read A0 first
+	gpio.mode(8,gpio.OUTPUT)
+	gpio.write(8,gpio.HIGH)
 
+	--Motor: initialize and reset
+	gpio.mode(0,gpio.OUTPUT)
+	gpio.mode(4,gpio.OUTPUT)
+
+	pwm.setup(5,50,0)
+	pwm.setup(3,50,0)
 	pwm.start(5)
-	pwm.start(4)
-	pwm.start(2)
 	pwm.start(3)
 end
 
@@ -28,8 +30,6 @@ apcfg.ssid = string.sub(apcfg.ssid,1,string.len(apcfg.ssid)-1)
 apcfg.pwd = "12345678"
 
 --Reset network wifi--
-pwm.setup(2,50,1023) -- Because pin 3 is initially 1023 value, stop pin 2 first
-pwm.start(2)
 gpio.mode(3,gpio.INPUT)
 
 local timeout = 0        

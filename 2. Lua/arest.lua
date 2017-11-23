@@ -87,11 +87,11 @@ function aREST.handle(conn, request)
 	end
     
     if (mode == "analog" or mode == "input") and not check_nil(value, 2) then
-        gpio.mode(0,gpio.OUTPUT)
+        gpio.mode(8,gpio.OUTPUT)
         if value[2] == 0 then
-            gpio.write(0,gpio.HIGH)
+            gpio.write(8,gpio.HIGH)
         else
-            gpio.write(0,gpio.LOW)
+            gpio.write(8,gpio.LOW)
         end
         message = error_handling(adc.read(0),0,1023)
     end
